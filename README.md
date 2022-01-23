@@ -40,3 +40,25 @@ C:\Users\xxx\src\github.com\ethereum\go-ethereum> go mod tidy
 ```
 C:\Users\xxx\src\github.com\ethereum\go-ethereum> go install -v ./cmd/...
 ```
+
+# GETH
+
+## Run a node?
+
+```
+geth
+```
+
+## Run the console & commands
+
+Run on MainNet (or Rinkeby):
+
+```
+geth console (--rinkeby)
+```
+
+Stop console:
+
+```
+exit (or Ctrl+D)
+```
