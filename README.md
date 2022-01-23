@@ -62,3 +62,11 @@ Stop console:
 ```
 exit (or Ctrl+D)
 ```
+
+# GO
+
+## Init new project
+
+```
+go mod init [yourModule.name]
+```
