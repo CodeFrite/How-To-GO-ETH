@@ -7,6 +7,12 @@ An introduction to GO-Ethereum programming
 
 Go to Chocolatey.org and install the package manager: [https://chocolatey.org/install](https://chocolatey.org/install)
 
+Basically, run this command in a terminal as ADMIN:
+
+```
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+```
+
 ## Git, Golang, Ming
 
 ```
