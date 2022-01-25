@@ -41,6 +41,11 @@ C:\Users\xxx\src\github.com\ethereum\go-ethereum> go mod tidy
 C:\Users\xxx\src\github.com\ethereum\go-ethereum> go install -v ./cmd/...
 ```
 
+## Run Tests
+```
+C:\Users\xxx\src\github.com\ethereum\go-ethereum> go test -v ./...
+```
+
 # GETH
 
 ## Run a node?
