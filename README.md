@@ -32,8 +32,14 @@ C:\Users\xxx> cd src\github.com\ethereum\go-ethereum
 ## Download and resolve dependencies
 
 ```
-C:\Users\xxx\src\github.com\ethereum\go-ethereum> go get -u -v golang.org/x/net/context
-C:\Users\xxx\src\github.com\ethereum\go-ethereum> go mod tidy
+C:\Users\xxx\go\src\github.com\ethereum\go-ethereum> go get -u -v golang.org/x/net/context
+C:\Users\xxx\go\src\github.com\ethereum\go-ethereum> go mod tidy
+```
+
+or 
+```
+C:\Users\xxx\go\src\github.com\ethereum\go-ethereum> git submodule init
+C:\Users\xxx\go\src\github.com\ethereum\go-ethereum> git submodule update
 ```
 
 ## Install Go-Ethereum
