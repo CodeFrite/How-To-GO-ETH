@@ -111,3 +111,20 @@ l := &lexer{
 	debug:  debug,
 }
 ```
+
+A Go routine is then launched in a separate thread to enable the lexer to process the source code and emit the tokens as they are processed on the `lexer.tokens` channel:
+```
+go func() {
+	l.emit(lineStart)		// each line begins with a `lineStart` token
+	for l.state != nil {		
+		l.state = l.state(l)	// replace the state fct by the result of the call to the state function
+	}
+	l.emit(eof)			// if there are no more characters in the source code, emit an `eof` token
+	close(l.tokens)			// close the `tokens` channel
+}()
+```
+
+While the go routine is still running, we return the handler to the tokens channel to the caller (compiler.go):
+```
+return ch 	// which corresponds to the Lex function return value: func Lex(source []byte, debug bool) <-chan token {
+```
