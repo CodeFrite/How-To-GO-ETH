@@ -1,6 +1,6 @@
 # Lexer
 
-The `lexer` is responsible for tokenizing the source code. It accepts as an input a source code, parses it and returns tokens distributed over a channel. Here are a few examples of inputs and outputs used in the `lexer_test.go` file:
+The `lexer` is responsible for tokenizing the source code for the compiler which converts them to bytecodes. It accepts as an input a source code, parses it and returns tokens distributed over a channel. Here are a few examples of inputs and outputs used in the `lexer_test.go` file:
 ```
 tests := []struct {
 	input  string
@@ -72,15 +72,15 @@ var stringtokenTypes = []string{
 A lexer is defined as follow:
 ```
 type lexer struct {
-	input string // input contains the source code of the program
+	input string 			// input contains the source code of the program
 
-	tokens chan token // tokens is used to deliver tokens to the listener
-	state  stateFn    // the current state function
+	tokens chan token 		// tokens is used to deliver tokens to the listener
+	state  stateFn    		// the current state function
 
-	lineno            int // current line number in the source file
-	start, pos, width int // positions for lexing and returning value
+	lineno            int 		// current line number in the source file
+	start, pos, width int 		// positions for lexing and returning value
 
-	debug bool // flag for triggering debug output
+	debug bool 			// flag for triggering debug output
 }
 ```
 
@@ -124,7 +124,67 @@ go func() {
 }()
 ```
 
-While the go routine is still running, we return the handler to the tokens channel to the caller (compiler.go):
+While the go routine is still running, we return the `tokens channel` to the caller:
 ```
 return ch 	// which corresponds to the Lex function return value: func Lex(source []byte, debug bool) <-chan token {
 ```
+
+### The state function: `lexLine`
+
+The state function defines how the source should be converted to tokens. Any function with the following signature can be accepted:
+```
+type stateFn func(*lexer) stateFn
+```
+
+In the `lexer.go` file, it uses the function `lexLine`:
+```
+func lexLine(l *lexer) stateFn {
+}
+```
+
+This function will parse the next `utf-8` character and will conditionaly decide to emit a token over the channel:
+```
+for {
+	switch r := l.next(); {
+	case r == '\n':
+		...
+	case r == ';' && l.peek() == ';':
+		...	
+	case isSpace(r):
+		...		
+	case isLetter(r) || r == '_':
+		...			
+	case isNumber(r):
+		...			
+	case r == '@':
+		...			
+	case r == '"':
+		...	
+	default:
+		return nil
+	}
+}
+```
+
+#### lexLine: New line
+
+If the lexer encounters an endline `\n` character, it will emit a `lineEnd` token and ignore the current character. As we have a new line of code, the lexer will increment the line number and emit a `lineStart` token:
+```
+case r == '\n':
+	l.emit(lineEnd)
+	l.ignore()
+	l.lineno++
+	l.emit(lineStart)
+```
+
+What actually does `lexer.ignore()`. It simply sets the lexer.start to the value lexer.pos which is equivalent as skipping the rune:
+```
+func (l *lexer) ignore() {
+	l.start = l.pos
+}
+```
+
+#### lexLine: Comment line
+
+case r == ';' && l.peek() == ';':
+	return lexComment
