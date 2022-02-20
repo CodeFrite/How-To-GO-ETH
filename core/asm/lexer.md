@@ -39,11 +39,9 @@ input(source) => output(tokens):
 PUSH 666 \n			=> (startLine, 1, ''), (element, 1, 'PUSH'), (number, 1, '666'), (endLine, 1, '')
 PUSH 111 \n			=> (startLine, 2, ''), (element, 2, 'PUSH'), (number, 1, '666'), (endLine, 2, '')
 ADD \n				=> (startLine, 3, ''), (element, 3, 'ADD'), (eof, 3, '')
-
-		tokens: []token{{typ: lineStart}, {typ: eof}},
 ```
-- the lexer reads the rune from the source 1 by 1 and decode them to UTF-8 using the built-in function `utf8.DecodeRuneInString()`
-- for each rune, it determines what to do
+
+Let's dive into the code and learn more about the internal types and the helpers functions.
 
 ## Types
 
@@ -109,9 +107,55 @@ type lexer struct {
 
 ## Helper functions
 
+**+++ next()**
+
+The helper function `next()` is used to ...:
+```
+func (l *lexer) next() (rune rune) {
+	if l.pos >= len(l.input) {
+		l.width = 0
+		return 0
+	}
+	rune, l.width = utf8.DecodeRuneInString(l.input[l.pos:])
+	l.pos += l.width
+	return rune
+}
+
 ![image](https://user-images.githubusercontent.com/34804976/154867481-2092ba6e-7f61-4f3a-a294-812a98d0e292.png)
 
-## Lexer entry point: `Lex`
+**+++ backup()**
+
+```
+// backup backsup the last parsed element (multi-character)
+func (l *lexer) backup() {
+	l.pos -= l.width
+}
+```
+
+**+++ peek()**
+
+The function `lexer.peek` allows us to get the value of the next rune without changing the `lexer.pos` value:
+```
+// peek returns the next rune but does not advance the seeker
+func (l *lexer) peek() rune {
+	r := l.next()
+	l.backup()
+	return r
+}
+```
+
+**+++ ignore()**
+
+What actually does `lexer.ignore()`. It simply sets the lexer.start to the value lexer.pos which is equivalent as skipping the rune:
+```
+func (l *lexer) ignore() {
+	l.start = l.pos
+}
+```
+
+Now that we have a basic understanding of the data structure and helper functions, let's look the the lexer main entry point, the `Lex` function.
+
+## Lexer entry point: `Lex()`
 
 The entry point of the `lexer` is the function `Lex`:
 ```
@@ -204,28 +248,12 @@ case r == '\n':
 	l.emit(lineStart)
 ```
 
-What actually does `lexer.ignore()`. It simply sets the lexer.start to the value lexer.pos which is equivalent as skipping the rune:
-```
-func (l *lexer) ignore() {
-	l.start = l.pos
-}
-```
-
 **+++ lexLine: Comment line**
 
 Comments in EVM bytecodes begin with ";;". Therefore, if the next rune is the character ";", we peek into the source []byte to see if the next character is also ";". If it is the case, we lex the current line as a `comment line`:
 ```
 case r == ';' && l.peek() == ';':
 	return lexComment
-```
-
-The function `lexer.peek` allows us to get the value of the next rune without changing the `lexer.pos` value:
-```
-func (l *lexer) peek() rune {
-	r := l.next()
-	l.backup()
-	return r
-}
 ```
 
 **+++ lexLine: New line**
