@@ -22,12 +22,49 @@ tests := []struct {
 }
 ```
 
+## Types
+
 A `token` is defined as follow:
 ```
 type token struct {
-	typ    tokenType
-	lineno int
-	text   string
+	typ    tokenType	// token type in: eof, lineStart, lineEnd, ...
+	lineno int		// line on which the token belong
+	text   string		// text of the token
 }
 ```
 
+The `typ tokenType` is defined as an int that finds its value in the following constants table:
+```
+type tokenType int
+
+const (
+	eof              tokenType = iota // end of file
+	lineStart                         // emitted when a line starts
+	lineEnd                           // emitted when a line ends
+	invalidStatement                  // any invalid statement
+	element                           // any element during element parsing
+	label                             // label is emitted when a label is found
+	labelDef                          // label definition is emitted when a new label is found
+	number                            // number is emitted when a number is found
+	stringValue                       // stringValue is emitted when a string has been found
+
+	Numbers            = "1234567890"                                           // characters representing any decimal number
+	HexadecimalNumbers = Numbers + "aAbBcCdDeEfF"                               // characters representing any hexadecimal
+	Alpha              = "abcdefghijklmnopqrstuwvxyzABCDEFGHIJKLMNOPQRSTUWVXYZ" // characters representing alphanumeric
+)
+```
+
+Corresponding labels are defined in the variable `stringtokenTypes`:
+```
+var stringtokenTypes = []string{
+	eof:              "EOF",
+	lineStart:        "new line",
+	lineEnd:          "end of line",
+	invalidStatement: "invalid statement",
+	element:          "element",
+	label:            "label",
+	labelDef:         "label definition",
+	number:           "number",
+	stringValue:      "string",
+}
+```
