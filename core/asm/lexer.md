@@ -22,6 +22,22 @@ tests := []struct {
 }
 ```
 
+The principle of the `lexer` is pretty straight forward. It reads the source code, character by character and tries to form words by follwing a defined grammar. In the case of EVM opcode, a line of code can contain a:
+- `comment` which starts with `;;`
+- `element` in alpha characters
+- `number` in digits
+- `stringValue` in alpha characters
+- `label` used for the `JUMP` instruction and beginning with the character `@`
+- `endline` \n character
+- `eof` character (end of file)
+
+Given the following
+```
+
+```
+- the lexer reads the rune from the source 1 by 1 and decode them to UTF-8 using the built-in function `utf8.DecodeRuneInString()`
+- for each rune, it determines what to do
+
 ## Types
 
 A `token` is defined as follow:
@@ -84,6 +100,10 @@ type lexer struct {
 }
 ```
 
+## Helper functions
+
+![image](https://user-images.githubusercontent.com/34804976/154867481-2092ba6e-7f61-4f3a-a294-812a98d0e292.png)
+
 ## Lexer entry point: `Lex`
 
 The entry point of the `lexer` is the function `Lex`:
@@ -131,7 +151,7 @@ return ch 	// which corresponds to the Lex function return value: func Lex(sourc
 
 ### The state function: `lexLine`
 
-The state function defines how the source should be converted to tokens. Any function with the following signature can be accepted:
+The state function defines how the source should be converted to tokens. Any function with the following signature can be used as a state function:
 ```
 type stateFn func(*lexer) stateFn
 ```
@@ -166,7 +186,7 @@ for {
 }
 ```
 
-#### lexLine: New line
+**+++ lexLine: New line**
 
 If the lexer encounters an endline `\n` character, it will emit a `lineEnd` token and ignore the current character. As we have a new line of code, the lexer will increment the line number and emit a `lineStart` token:
 ```
@@ -184,7 +204,24 @@ func (l *lexer) ignore() {
 }
 ```
 
-#### lexLine: Comment line
+**+++ lexLine: Comment line**
 
+Comments in EVM bytecodes begin with ";;". Therefore, if the next rune is the character ";", we peek into the source []byte to see if the next character is also ";". If it is the case, we lex the current line as a `comment line`:
+```
 case r == ';' && l.peek() == ';':
 	return lexComment
+```
+
+The function `lexer.peek` allows us to get the value of the next rune without changing the `lexer.pos` value:
+```
+func (l *lexer) peek() rune {
+	r := l.next()
+	l.backup()
+	return r
+}
+```
+
+**+++ lexLine: New line**
+
+```
+```
