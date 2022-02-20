@@ -31,9 +31,16 @@ The principle of the `lexer` is pretty straight forward. It reads the source cod
 - `endline` \n character
 - `eof` character (end of file)
 
-Given the following
+Given the following input, the lexer will slice the code in the following places and emit tokens:
 ```
+input(source) => output(tokens):  
 
+;; this is a comment \n		=> (startLine, 0, ''), (endLine, 0, '')
+PUSH 666 \n			=> (startLine, 1, ''), (element, 1, 'PUSH'), (number, 1, '666'), (endLine, 1, '')
+PUSH 111 \n			=> (startLine, 2, ''), (element, 2, 'PUSH'), (number, 1, '666'), (endLine, 2, '')
+ADD \n				=> (startLine, 3, ''), (element, 3, 'ADD'), (eof, 3, '')
+
+		tokens: []token{{typ: lineStart}, {typ: eof}},
 ```
 - the lexer reads the rune from the source 1 by 1 and decode them to UTF-8 using the built-in function `utf8.DecodeRuneInString()`
 - for each rune, it determines what to do
