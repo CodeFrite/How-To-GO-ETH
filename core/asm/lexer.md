@@ -120,6 +120,7 @@ func (l *lexer) next() (rune rune) {
 	l.pos += l.width
 	return rune
 }
+```
 
 ![image](https://user-images.githubusercontent.com/34804976/154867481-2092ba6e-7f61-4f3a-a294-812a98d0e292.png)
 
