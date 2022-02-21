@@ -22,7 +22,7 @@ tests := []struct {
 }
 ```
 
-The principle of the `lexer` is pretty straight forward. It reads the source code, character by character and tries to form words by follwing a defined grammar. In the case of EVM opcode, a line of code can contain a:
+The principle of the `lexer` is pretty straight forward. It reads the source code, character by character and tries to form words by following a defined grammar. In the case of EVM opcode, a line of code can contain a:
 - `comment` which starts with `;;`
 - `element` in alpha characters
 - `number` in digits
@@ -35,10 +35,10 @@ Given the following input, the lexer will slice the code in the following places
 ```
 input(source) => output(tokens):  
 
-;; this is a comment \n		=> (startLine, 0, ''), (endLine, 0, '')
-PUSH 666 \n			=> (startLine, 1, ''), (element, 1, 'PUSH'), (number, 1, '666'), (endLine, 1, '')
-PUSH 111 \n			=> (startLine, 2, ''), (element, 2, 'PUSH'), (number, 1, '666'), (endLine, 2, '')
-ADD \n				=> (startLine, 3, ''), (element, 3, 'ADD'), (eof, 3, '')
+;; this is a comment \n		=> this line will be ignored
+PUSH 666 \n			=> (startLine, 0, ''), (element, 0, 'PUSH'), (number, 0, '666'), (endLine, 0, '')
+PUSH 111 \n			=> (startLine, 1, ''), (element, 1, 'PUSH'), (number, 1, '666'), (endLine, 1, '')
+ADD \n				=> (startLine, 2, ''), (element, 2, 'ADD'), (eof, 3, '')
 ```
 
 Let's dive into the code and learn more about the internal types and the helpers functions.
