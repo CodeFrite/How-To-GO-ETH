@@ -257,6 +257,18 @@ case r == ';' && l.peek() == ';':
 	return lexComment
 ```
 
+As we can see, comment lines are simply ignored by the lexer. Indeed, the lexer will try to find the next `endLine` character and ignore the comment part of the source by setting his starting position to the current position:
+```
+// lexComment parses the current position until the end
+// of the line and discards the text.
+func lexComment(l *lexer) stateFn {
+	l.acceptRunUntil('\n')
+	l.ignore()
+
+	return lexLine
+}
+```
+
 **+++ lexLine: New line**
 
 ```
